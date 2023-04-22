@@ -14,7 +14,7 @@ class Board(models.Model):
 
 
 class Task(models.Model):
-    board = models.ForeignKey(to=Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(to=Board, on_delete=models.CASCADE, related_name='board_tasks')
     task_description = models.CharField(max_length=250)
     added_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)

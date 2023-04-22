@@ -19,24 +19,23 @@ class BoardView(APIView):
             "data": serailzer.data
         })
 
-
     def post(self, request):
         request.data['user'] = request.user.id
         serializer = BoardSerializer(data=request.data)
-        
+
         if not serializer.is_valid():
             return Response(data={
                 "error": True,
                 "message": "'name' is the required field"
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         serializer.save()
 
         return Response(data={
             "error": False,
             "data": serializer.data
         })
-    
+
     def patch(self, request, id):
         try:
             board = Board.objects.get(id=id)
@@ -45,22 +44,28 @@ class BoardView(APIView):
                 "error": True,
                 "message": "Invalid Board Id"
             })
-        
+
+        if request.user.id != board.user_id:
+            return Response(data={
+                "error": True,
+                "message": "Invalid User"
+            })
+
         request.data['user'] = request.user.id
-        
-        serializer = BoardSerializer(instance=board, data=request.data)
+
+        serializer = BoardSerializer(instance=board, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(data={
                 "error": True,
                 "message": "'name' is the required field"
             }, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
-        
+
         return Response(data={
             "error": False,
             "data": serializer.data
         })
-    
+
     def delete(self, request, id):
         try:
             board = Board.objects.get(id=id)
@@ -69,9 +74,15 @@ class BoardView(APIView):
                 "error": True,
                 "message": "Invalid Board Id"
             })
-        
+
+        if request.user.id != board.user_id:
+            return Response(data={
+                "error": True,
+                "message": "Invalid User"
+            })
+
         board.delete()
-        
+
         return Response(data={
             "error": False,
             "message": "Board deleted successfully!"
@@ -90,23 +101,22 @@ class TaskView(APIView):
             "data": serailzer.data
         })
 
-
     def post(self, request):
         serializer = TaskSerializer(data=request.data)
-        
+
         if not serializer.is_valid():
             return Response(data={
                 "error": True,
                 "message": f"'task_description' and 'board' are required fields"
             }, status=status.HTTP_400_BAD_REQUEST)
-        
+
         serializer.save()
 
         return Response(data={
             "error": False,
             "data": serializer.data
         })
-    
+
     def patch(self, request, id):
         try:
             task = Task.objects.get(id=id)
@@ -115,20 +125,26 @@ class TaskView(APIView):
                 "error": True,
                 "message": "Invalid Task Id"
             })
-        
-        serializer = TaskSerializer(instance=task, data=request.data)
+
+        if request.user.id != task.board.user_id:
+            return Response(data={
+                "error": True,
+                "message": "Invalid User"
+            })
+
+        serializer = TaskSerializer(instance=task, data=request.data, partial=True)
         if not serializer.is_valid():
             return Response(data={
                 "error": True,
                 "message": f"{serializer.errors.keys()} is the required field"
             }, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
-        
+
         return Response(data={
             "error": False,
             "data": serializer.data
         })
-    
+
     def delete(self, request, id):
         try:
             task = Task.objects.get(id=id)
@@ -137,9 +153,15 @@ class TaskView(APIView):
                 "error": True,
                 "message": "Invalid Task Id"
             })
-        
+
+        if request.user.id != task.board.user_id:
+            return Response(data={
+                "error": True,
+                "message": "Invalid User"
+            })
+
         task.delete()
-        
+ 
         return Response(data={
             "error": False,
             "message": "Task deleted successfully!"
