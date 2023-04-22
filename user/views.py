@@ -46,7 +46,7 @@ class UserRegistrationView(APIView):
 
         response = {
             "error": False,
-            "details": {
+            "data": {
                 "access_token": access_token,
                 "refresh_token": refresh_token
             }
@@ -76,9 +76,11 @@ class UserLoginView(APIView):
 
         response = {
             "error": False,
-            "details": {
+            "data": {
                 "access_token": access_token,
-                "refresh_token": refresh_token
+                "refresh_token": refresh_token,
+                "email": user.email,
+                "username": user.username
             }
         }
         return Response(response, status=status.HTTP_200_OK)
