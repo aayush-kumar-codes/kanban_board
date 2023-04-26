@@ -1,0 +1,9 @@
+FROM python:3.10
+
+WORKDIR ./
+COPY ./requirements.txt requirements.txt
+RUN sudo apt-get install mysql-client && sudo apt-get install libmysqlclient-dev && sudo apt-get install libssl-dev
+RUN sudo apt-get install default-libmysqlclient-dev
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
